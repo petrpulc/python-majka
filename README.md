@@ -29,7 +29,7 @@ No dependencies outside standard Python and C++ build environment should be need
     morph.flags |= majka.ADD_DIACRITICS  # find word forms with diacritics
     morph.flags |= majka.DISALLOW_LOWERCASE  # do not enable to find lowercase variants
     morph.flags |= majka.IGNORE_CASE  # ignore the word case whatsoever
-    morph.flags |= 0  # unset all flags
+    morph.flags = 0  # unset all flags
 
     morph.tags = False  # return just the lemma, do not process the tags
     morph.tags = True  # turn tag processing back on
