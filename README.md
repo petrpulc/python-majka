@@ -12,7 +12,11 @@ An example from Czech: 'dělala' (she did) is transformed to 'dělat' (do) and t
 
 Tags returned from the analyzer that comply with new tagset reference (for example cs, sk) are transcribed into a native Python dictionary to enable a much more Python-like experience without a need to study the documentation. Other or falsely recognized are stored in entry 'other'.
 
-##Build and install instructions
+##Install / Build instructions
+Module is available in PyPi, use `pip install majka` to install.
+
+For local build / install use:
+
     ./setup.py build
     ./setup.py install
 
