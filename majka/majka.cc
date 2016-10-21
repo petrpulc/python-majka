@@ -399,7 +399,10 @@ case 7: { // w-w
 
 case 1 + 128: { // w-lt
   int prefix_len = candidate[input_len + 1] - 'A';
-  my_strncpy(result, candidate + prefix_len, input_len - prefix_len - (candidate[input_len + 2] - 'A'));
+  int n = input_len - prefix_len;
+  n -= candidate[input_len + 2] - 'A';
+  if (n<0) n = 0;
+  my_strncpy(result, candidate + prefix_len, (size_t) n);
   my_strxcpy(result, candidate + input_len + 3);
 } break;
 
