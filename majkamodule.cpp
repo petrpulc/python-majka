@@ -5,6 +5,10 @@
 #include <iostream>
 #include "majka/majka.h"
 
+#if PY_MAJOR_VERSION >= 3
+  #define PY3K
+#endif
+
 typedef struct {
   PyObject_HEAD
   fsa* majka;
@@ -543,6 +547,7 @@ static PyTypeObject MajkaType = {
   Majka_new,                 /* tp_new */
 };
 
+#ifdef PY3K
 static PyModuleDef majkamodule = {
   PyModuleDef_HEAD_INIT,
   "majka",
@@ -551,15 +556,25 @@ static PyModuleDef majkamodule = {
   NULL, NULL, NULL, NULL, NULL
 };
 
-PyMODINIT_FUNC PyInit_majka(void) {
+#define init_function PyInit_majka
+#define init_return(value) return (value)
+#else
+#define init_function initmajka
+#define init_return(unused) return
+#endif
+
+PyMODINIT_FUNC init_function(void) {
   PyObject* m;
 
   if (PyType_Ready(&MajkaType) < 0)
-    return NULL;
-
+    init_return(NULL);
+#ifdef PY3K
   m = PyModule_Create(&majkamodule);
+#else
+  m = Py_InitModule3("majka", NULL, NULL);
+#endif
   if (m == NULL)
-    return NULL;
+    init_return(NULL);
 
   Py_INCREF(&MajkaType);
   PyModule_AddObject(m, "Majka",
@@ -570,6 +585,6 @@ PyMODINIT_FUNC PyInit_majka(void) {
                      PyLong_FromLong(IGNORE_CASE));
   PyModule_AddObject(m, "DISALLOW_LOWERCASE",
                      PyLong_FromLong(DISALLOW_LOWERCASE));
-  return m;
+  init_return(m);
 }
 
