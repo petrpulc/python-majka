@@ -37,19 +37,33 @@ No dependencies outside standard Python and C++ build environment should be need
     morph.first_only = True  # return only the first entry
     morph.first_only = False  # return all entries (default)
 
-    morph.find('nejvhodnější')
+    morph.find('nejnevhodnější')
 
-##Returns
+###Returns
     [{'lemma': 'vhodný',
       'tags': {'case': 1,
                'gender': 'feminine',
-               'negation': False,
+               'negation': True,
                'plural': True,
                'pos': 'adjective',
                'degree': 3}
      },
     ...
     ]
+
+
+##Usage with negations
+`.tags = False` causes a transformation of the negation into the lemma itself. By default, "-" sign is prepended, but value can be changed by setting the `.negative` value.
+
+    morph.tags = False
+    morph.first_only = True
+    morph.negative = "ne"
+
+    morph.find('nejnevhodnější')
+
+###Returns
+
+    [{'lemma': 'nevhodný'}]
 
 ##Attributions
 The module is based on code of Pavel Smerk and Pavel Rychly, NLP group at MUNI, Czech Republic.

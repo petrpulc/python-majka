@@ -2,6 +2,7 @@
 
 #include <Python.h>
 #include <structmember.h>
+#include <string.h>
 #include <iostream>
 #include "majka/majka.h"
 
@@ -15,6 +16,7 @@ typedef struct {
   int flags;
   bool tags;
   bool first_only;
+  PyObject* negative;
 } Majka;
 
 static void Majka_dealloc(Majka* self) {
@@ -30,6 +32,7 @@ static PyObject* Majka_new(PyTypeObject* type,
   self->flags = 0;
   self->tags = true;
   self->first_only = false;
+  self->negative = PyUnicode_FromString("-");
   return reinterpret_cast<PyObject*>(self);
 }
 
@@ -55,6 +58,19 @@ static int Majka_init(Majka* self, PyObject* args, PyObject* kwds) {
     return -1;
   }
 
+  return 0;
+}
+
+int is_negation(char* tag_string){
+  if (*tag_string == 'k'){
+    tag_string += 2;
+  }
+  if (*tag_string == 'e') {
+    ++tag_string;
+    if (*tag_string == 'N') {
+      return 1;
+    }
+  }
   return 0;
 }
 
@@ -457,7 +473,7 @@ static PyObject* Majka_tags(char * tag_string) {
 static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
   const char* word = NULL;
   char* results = new char[self->majka->max_results_size];
-  char* entry, * colon;
+  char* entry, * colon, * negative;
   char tmp_lemma[300];
   PyObject* ret = PyList_New(0);
   PyObject* option;
@@ -483,10 +499,23 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
     colon = strchr(entry, ':');
     memcpy(tmp_lemma, entry, colon-entry);
     tmp_lemma[colon-entry] = '\0';
-    option = Py_BuildValue("{s:O}",
-                           "lemma", PyUnicode_FromString(tmp_lemma));
+
     if (self->tags) {
-      PyDict_SetItemString(option, "tags", Majka_tags(colon+1));
+      option = Py_BuildValue("{s:O,s:O}",
+                             "lemma", PyUnicode_FromString(tmp_lemma),
+                             "tags", Majka_tags(colon+1));
+    } else {
+      if (is_negation(colon+1)){
+#ifdef PY3K
+        negative = PyUnicode_AsUTF8(self->negative);
+#else
+        negative = PyString_AsString(self->negative);
+#endif
+        memmove(tmp_lemma+strlen(negative), tmp_lemma, strlen(tmp_lemma)+1);
+        memcpy(tmp_lemma, negative, strlen(negative));
+      }
+      option = Py_BuildValue("{s:O}",
+                             "lemma", PyUnicode_FromString(tmp_lemma));
     }
     PyList_Append(ret, option);
   }
@@ -508,6 +537,8 @@ static PyMemberDef Majka_members[] = {
    const_cast<char*>("If tags should be extracted and converted.")},
   {const_cast<char*>("first_only"), T_BOOL, offsetof(Majka, first_only), 0,
    const_cast<char*>("If only first match should be returned.")},
+  {const_cast<char*>("negative"), T_OBJECT, offsetof(Majka, negative), 0,
+   const_cast<char*>("Negative prefix for languages supporting a negative tag.")},
   {NULL}
 };
 
