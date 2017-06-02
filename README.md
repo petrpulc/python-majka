@@ -1,18 +1,18 @@
-#Python wrapper for Majka
+# Python wrapper for Majka
 
-##What is Majka
+## What is Majka
 Majka is a linguistics tool for morphology analysis.
 
 Depending on passed dictionaries, the searched word form is translated to a lemma (basic form) and tags determining the linguistic properties of the word or other way around.
 
-##For what can be this module used?
+## For what can be this module used?
 The lemmatization of documents is heavily used in text processing, as it simplifies the processing of text in inflective languages.
 
 An example from Czech: 'dělala' (she did) is transformed to 'dělat' (do) and tags determining the past tense, female gender and others are added.
 
 Tags returned from the analyzer that comply with new tagset reference (for example cs, sk) are transcribed into a native Python dictionary to enable a much more Python-like experience without a need to study the documentation. Other or falsely recognized are stored in entry 'other'.
 
-##Install / Build instructions
+## Install / Build instructions
 Module is available in PyPi, use `pip install majka` to install.
 
 For local build / install use:
@@ -22,7 +22,7 @@ For local build / install use:
 
 No dependencies outside standard Python and C++ build environment should be needed. (gcc, python-dev, etc.)
 
-##Usage
+## Usage
     import majka
     morph = majka.Majka('path/to/dict')
 
@@ -39,7 +39,7 @@ No dependencies outside standard Python and C++ build environment should be need
 
     morph.find('nejnevhodnější')
 
-###Returns
+### Returns
     [{'lemma': 'vhodný',
       'tags': {'case': 1,
                'gender': 'feminine',
@@ -52,7 +52,7 @@ No dependencies outside standard Python and C++ build environment should be need
     ]
 
 
-##Usage with negations
+## Usage with negations
 `.tags = False` causes a transformation of the negation into the lemma itself. By default, "-" sign is prepended, but value can be changed by setting the `.negative` value.
 
     morph.tags = False
@@ -61,15 +61,15 @@ No dependencies outside standard Python and C++ build environment should be need
 
     morph.find('nejnevhodnější')
 
-###Returns
+### Returns
 
     [{'lemma': 'nevhodný'}]
 
-##Attributions
+## Attributions
 The module is based on code of Pavel Smerk and Pavel Rychly, NLP group at MUNI, Czech Republic.
 
 Original `majka` binary is in `majka/majka_bin.cc`, see `majka/Makefile` for build.
 
-##Additional required downloads
+## Additional required downloads
 Morphological automatons are distributed separately under different licenses.
 See http://nlp.fi.muni.cz/ma/
