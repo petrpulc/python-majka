@@ -32,7 +32,10 @@ No dependencies outside standard Python and C++ build environment should be need
     morph.flags = 0  # unset all flags
 
     morph.tags = False  # return just the lemma, do not process the tags
-    morph.tags = True  # turn tag processing back on
+    morph.tags = True  # turn tag processing back on (default)
+
+    morph.first_only = True  # return only the first entry
+    morph.first_only = False  # return all entries (default)
 
     morph.find('nejvhodnější')
 

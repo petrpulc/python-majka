@@ -14,6 +14,7 @@ typedef struct {
   fsa* majka;
   int flags;
   bool tags;
+  bool first_only;
 } Majka;
 
 static void Majka_dealloc(Majka* self) {
@@ -28,6 +29,7 @@ static PyObject* Majka_new(PyTypeObject* type,
   self = reinterpret_cast<Majka*>(type->tp_alloc(type, 0));
   self->flags = 0;
   self->tags = true;
+  self->first_only = false;
   return reinterpret_cast<PyObject*>(self);
 }
 
@@ -475,6 +477,8 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
     return ret;
   }
 
+  if (self->first_only) rc = 1;
+
   for (entry = results, i=0; i < rc; i++, entry += strlen(entry) + 1) {
     colon = strchr(entry, ':');
     memcpy(tmp_lemma, entry, colon-entry);
@@ -502,6 +506,8 @@ static PyMemberDef Majka_members[] = {
    const_cast<char*>("Flags to run Majka with.")},
   {const_cast<char*>("tags"), T_BOOL, offsetof(Majka, tags), 0,
    const_cast<char*>("If tags should be extracted and converted.")},
+  {const_cast<char*>("first_only"), T_BOOL, offsetof(Majka, first_only), 0,
+   const_cast<char*>("If only first match should be returned.")},
   {NULL}
 };
 
