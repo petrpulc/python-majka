@@ -21,6 +21,7 @@ typedef struct {
 
 static void Majka_dealloc(Majka* self) {
   delete self->majka;
+  Py_DECREF(self->negative);
   Py_TYPE(self)->tp_free(reinterpret_cast<Majka*>(self));
 }
 
@@ -74,6 +75,33 @@ int is_negation(char* tag_string){
   return 0;
 }
 
+static int dict_set(PyObject* dict, const char* key, PyObject* obj){
+  int rv = PyDict_SetItemString(dict, key, obj);
+  Py_DECREF(obj);
+  return rv;
+}
+
+static int dict_set_string(PyObject* dict, const char* key, const char* val){
+  PyObject* obj = PyUnicode_FromString(val);
+  return dict_set(dict, key, obj);
+}
+
+static int dict_set_numeric(PyObject* dict, const char* key, const char* val){
+  PyObject* obj = PyLong_FromString(val, NULL, 10);
+  return dict_set(dict, key, obj);
+}
+
+static int list_append(PyObject* list, PyObject* obj){
+  int rv = PyList_Append(list, obj);
+  Py_DECREF(obj);
+  return rv;
+}
+
+static int list_append_string(PyObject* list, const char* val){
+  PyObject* obj = PyUnicode_FromString(val);
+  return list_append(list, obj);
+}
+
 static PyObject* Majka_tags(char * tag_string) {
   PyObject* tags = PyDict_New();
   char category = ' ';
@@ -85,48 +113,37 @@ static PyObject* Majka_tags(char * tag_string) {
     category = *tag_string;
     switch (category) {
       case '1':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("substantive"));
+        dict_set_string(tags, "pos", "substantive");
         break;
       case '2':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("adjective"));
+        dict_set_string(tags, "pos", "adjective");
         break;
       case '3':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("pronomina"));
+        dict_set_string(tags, "pos", "pronomina");
         break;
       case '4':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("numeral"));
+        dict_set_string(tags, "pos", "numeral");
         break;
       case '5':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("verb"));
+        dict_set_string(tags, "pos", "verb");
         break;
       case '6':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("adverb"));
+        dict_set_string(tags, "pos", "adverb");
         break;
       case '7':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("preposition"));
+        dict_set_string(tags, "pos", "preposition");
         break;
       case '8':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("conjuction"));
+        dict_set_string(tags, "pos", "conjuction");
         break;
       case '9':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("particle"));
+        dict_set_string(tags, "pos", "particle");
         break;
       case '0':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("interjection"));
+        dict_set_string(tags, "pos", "interjection");
         break;
       case 'I':
-        PyDict_SetItemString(tags, "pos",
-                             PyUnicode_FromString("punctuation"));
+        dict_set_string(tags, "pos", "punctuation");
         break;
     }
     ++tag_string;
@@ -136,10 +153,10 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'A':
-        PyDict_SetItemString(tags, "negation", Py_False);
+        dict_set(tags, "negation", Py_False);
         break;
       case 'N':
-        PyDict_SetItemString(tags, "negation", Py_True);
+        dict_set(tags, "negation", Py_True);
         break;
     }
     ++tag_string;
@@ -149,12 +166,10 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'P':
-        PyDict_SetItemString(tags, "aspect",
-                             PyUnicode_FromString("perfect"));
+        dict_set_string(tags, "aspect", "perfect");
         break;
       case 'I':
-        PyDict_SetItemString(tags, "aspect",
-                             PyUnicode_FromString("imperfect"));
+        dict_set_string(tags, "aspect", "imperfect");
         break;
     }
     ++tag_string;
@@ -164,36 +179,28 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'F':
-        PyDict_SetItemString(tags, "mode",
-                             PyUnicode_FromString("infinitive"));
+        dict_set_string(tags, "mode", "infinitive");
         break;
       case 'I':
-        PyDict_SetItemString(tags, "mode",
-                             PyUnicode_FromString("present indicative"));
+        dict_set_string(tags, "mode", "present indicative");
         break;
       case 'R':
-        PyDict_SetItemString(tags, "mode",
-                             PyUnicode_FromString("imperative"));
+        dict_set_string(tags, "mode", "imperative");
         break;
       case 'A':
-        PyDict_SetItemString(tags, "mode",
-                             PyUnicode_FromString("active participle"));
+        dict_set_string(tags, "mode", "active participle");
         break;
       case 'N':
-        PyDict_SetItemString(tags, "mode",
-                             PyUnicode_FromString("passive participle"));
+        dict_set_string(tags, "mode", "passive participle");
         break;
       case 'S':
-        PyDict_SetItemString(tags, "mode",
-                        PyUnicode_FromString("adverbium participle, present"));
+        dict_set_string(tags, "mode", "adverbium participle, present");
         break;
       case 'D':
-        PyDict_SetItemString(tags, "mode",
-                           PyUnicode_FromString("adverbium participle, past"));
+        dict_set_string(tags, "mode", "adverbium participle, past");
         break;
       case 'B':
-        PyDict_SetItemString(tags, "mode",
-                             PyUnicode_FromString("futureu indicative"));
+        dict_set_string(tags, "mode", "future indicative");
         break;
     }
     ++tag_string;
@@ -202,7 +209,7 @@ static PyObject* Majka_tags(char * tag_string) {
   if (*tag_string == 'p') {
     ++tag_string;
     tmp[0] = *tag_string;
-    PyDict_SetItemString(tags, "person", PyLong_FromString(tmp, NULL, 10));
+    dict_set_numeric(tags, "person", tmp);
     ++tag_string;
   }
 
@@ -210,22 +217,18 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'M':
-        PyDict_SetItemString(tags, "gender",
-                             PyUnicode_FromString("masculine"));
-        PyDict_SetItemString(tags, "animate", Py_True);
+        dict_set_string(tags, "gender", "masculine");
+        dict_set(tags, "animate", Py_True);
         break;
       case 'I':
-        PyDict_SetItemString(tags, "gender",
-                             PyUnicode_FromString("masculine"));
-        PyDict_SetItemString(tags, "animate", Py_False);
+        dict_set_string(tags, "gender", "masculine");
+        dict_set(tags, "animate", Py_False);
         break;
       case 'F':
-        PyDict_SetItemString(tags, "gender",
-                             PyUnicode_FromString("feminine"));
+        dict_set_string(tags, "gender", "feminine");
         break;
       case 'N':
-        PyDict_SetItemString(tags, "gender",
-                             PyUnicode_FromString("neuter"));
+        dict_set_string(tags, "gender", "neuter");
         break;
     }
     ++tag_string;
@@ -235,10 +238,10 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'S':
-        PyDict_SetItemString(tags, "singular", Py_True);
+        dict_set(tags, "singular", Py_True);
         break;
       case 'P':
-        PyDict_SetItemString(tags, "plural", Py_True);
+        dict_set(tags, "plural", Py_True);
         break;
     }
     ++tag_string;
@@ -247,21 +250,21 @@ static PyObject* Majka_tags(char * tag_string) {
   if (*tag_string == 'c') {
     ++tag_string;
     tmp[0] = *tag_string;
-    PyDict_SetItemString(tags, "case", PyLong_FromString(tmp, NULL, 10));
+    dict_set_numeric(tags, "case", tmp);
     ++tag_string;
   }
 
   if (*tag_string == 'p') {  // Duplicate
     ++tag_string;
     tmp[0] = *tag_string;
-    PyDict_SetItemString(tags, "person", PyLong_FromString(tmp, NULL, 10));
+    dict_set_numeric(tags, "person", tmp);
     ++tag_string;
   }
 
   if (*tag_string == 'd') {
     ++tag_string;
     tmp[0] = *tag_string;
-    PyDict_SetItemString(tags, "degree", PyLong_FromString(tmp, NULL, 10));
+    dict_set_numeric(tags, "degree", tmp);
     ++tag_string;
   }
 
@@ -271,81 +274,81 @@ static PyObject* Majka_tags(char * tag_string) {
       case '1':
         switch (*tag_string) {
           case 'P':
-            PyList_Append(type, PyUnicode_FromString("half"));
+            list_append_string(type, "half");
             break;
           case 'F':
-            PyList_Append(type, PyUnicode_FromString("family surname"));
+            list_append_string(type, "family surname");
             break;
         }
         break;
       case '3':
         switch (*tag_string) {
           case 'P':
-            PyList_Append(type, PyUnicode_FromString("personal"));
+            list_append_string(type, "personal");
             break;
           case 'O':
-            PyList_Append(type, PyUnicode_FromString("possessive"));
+            list_append_string(type, "possessive");
             break;
           case 'D':
-            PyList_Append(type, PyUnicode_FromString("demonstrative"));
+            list_append_string(type, "demonstrative");
             break;
           case 'T':
-            PyList_Append(type, PyUnicode_FromString("deliminative"));
+            list_append_string(type, "deliminative");
             break;
         }
         break;
       case '4':
         switch (*tag_string) {
           case 'C':
-            PyList_Append(type, PyUnicode_FromString("cardinal"));
+            list_append_string(type, "cardinal");
             break;
           case 'O':
-            PyList_Append(type, PyUnicode_FromString("ordinal"));
+            list_append_string(type, "ordinal");
             break;
           case 'R':
-            PyList_Append(type, PyUnicode_FromString("reproductive"));
+            list_append_string(type, "reproductive");
             break;
         }
         break;
       case '6':
         switch (*tag_string) {
           case 'D':
-            PyList_Append(type, PyUnicode_FromString("demonstrative"));
+            list_append_string(type, "demonstrative");
             break;
           case 'T':
-            PyList_Append(type, PyUnicode_FromString("delimitative"));
+            list_append_string(type, "delimitative");
             break;
         }
         break;
       case '8':
         switch (*tag_string) {
           case 'C':
-            PyList_Append(type, PyUnicode_FromString("coordinate"));
+            list_append_string(type, "coordinate");
             break;
           case 'S':
-            PyList_Append(type, PyUnicode_FromString("subordinate"));
+            list_append_string(type, "subordinate");
             break;
         }
         break;
       case 'I':
         switch (*tag_string) {
           case '.':
-            PyList_Append(type, PyUnicode_FromString("stop"));
+            list_append_string(type, "stop");
             break;
           case ',':
-            PyList_Append(type, PyUnicode_FromString("semi-stop"));
+            list_append_string(type, "semi-stop");
             break;
           case '"':
-            PyList_Append(type, PyUnicode_FromString("parenthesis"));
+            list_append_string(type, "parenthesis");
             break;
           case '(':
-            PyList_Append(type, PyUnicode_FromString("opening"));
+            list_append_string(type, "opening");
             break;
           case ')':
-            PyList_Append(type, PyUnicode_FromString("closing"));
+            list_append_string(type, "closing");
             break;
           case '~':
-            PyList_Append(type, PyUnicode_FromString("other"));
+            list_append_string(type, "other");
             break;
         }
         break;
@@ -357,19 +360,19 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'F':
-        PyList_Append(type, PyUnicode_FromString("reflective"));
+        list_append_string(type, "reflective");
         break;
       case 'Q':
-        PyList_Append(type, PyUnicode_FromString("interrogative"));
+        list_append_string(type, "interrogative");
         break;
       case 'R':
-        PyList_Append(type, PyUnicode_FromString("relative"));
+        list_append_string(type, "relative");
         break;
       case 'N':
-        PyList_Append(type, PyUnicode_FromString("negative"));
+        list_append_string(type, "negative");
         break;
       case 'I':
-        PyList_Append(type, PyUnicode_FromString("indeterminate"));
+        list_append_string(type, "indeterminate");
         break;
     }
     ++tag_string;
@@ -379,28 +382,28 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
         case 'S':
-            PyList_Append(type, PyUnicode_FromString("status"));
+            list_append_string(type, "status");
             break;
         case 'D':
-            PyList_Append(type, PyUnicode_FromString("modal"));
+            list_append_string(type, "modal");
             break;
         case 'T':
-            PyList_Append(type, PyUnicode_FromString("time"));
+            list_append_string(type, "time");
             break;
         case 'A':
-            PyList_Append(type, PyUnicode_FromString("respect"));
+            list_append_string(type, "respect");
             break;
         case 'C':
-            PyList_Append(type, PyUnicode_FromString("reason"));
+            list_append_string(type, "reason");
             break;
         case 'L':
-            PyList_Append(type, PyUnicode_FromString("place"));
+            list_append_string(type, "place");
             break;
         case 'M':
-            PyList_Append(type, PyUnicode_FromString("manner"));
+            list_append_string(type, "manner");
             break;
         case 'Q':
-            PyList_Append(type, PyUnicode_FromString("extent"));
+            list_append_string(type, "extent");
             break;
     }
     ++tag_string;
@@ -410,16 +413,13 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'S':
-        PyDict_SetItemString(tags, "subclass",
-                             PyUnicode_FromString("-s enclictic"));
+        dict_set_string(tags, "subclass", "-s enclictic");
         break;
       case 'Y':
-        PyDict_SetItemString(tags, "subclass",
-                             PyUnicode_FromString("conditional"));
+        dict_set_string(tags, "subclass", "conditional");
         break;
       case 'A':
-        PyDict_SetItemString(tags, "subclass",
-                             PyUnicode_FromString("abbreviation"));
+        dict_set_string(tags, "subclass", "abbreviation");
         break;
     }
     ++tag_string;
@@ -429,24 +429,19 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'B':
-        PyDict_SetItemString(tags, "style",
-                             PyUnicode_FromString("poeticism"));
+        dict_set_string(tags, "style", "poeticism");
         break;
       case 'H':
-        PyDict_SetItemString(tags, "style",
-                             PyUnicode_FromString("conversational"));
+        dict_set_string(tags, "style", "conversational");
         break;
       case 'N':
-        PyDict_SetItemString(tags, "style",
-                             PyUnicode_FromString("dialectal"));
+        dict_set_string(tags, "style", "dialectal");
         break;
       case 'R':
-        PyDict_SetItemString(tags, "style",
-                             PyUnicode_FromString("rare"));
+        dict_set_string(tags, "style", "rare");
         break;
       case 'Z':
-        PyDict_SetItemString(tags, "style",
-                             PyUnicode_FromString("obsolete"));
+        dict_set_string(tags, "style", "obsolete");
         break;
     }
     ++tag_string;
@@ -455,16 +450,18 @@ static PyObject* Majka_tags(char * tag_string) {
   if (*tag_string == '~') {
     ++tag_string;
     tmp[0] = *tag_string;
-    PyDict_SetItemString(tags, "frequency", PyLong_FromString(tmp, NULL, 10));
+    dict_set_numeric(tags, "frequency", tmp);
     ++tag_string;
   }
 
   if (PyList_Size(type)) {
-    PyDict_SetItemString(tags, "type", type);
+    dict_set(tags, "type", type);
+  } else {
+    Py_DECREF(type);
   }
 
   if (*tag_string) {
-    PyDict_SetItemString(tags, "other", PyUnicode_FromString(tag_string));
+    dict_set_string(tags, "other", tag_string);
   }
 
   return tags;
@@ -517,7 +514,7 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
       option = Py_BuildValue("{s:O}",
                              "lemma", PyUnicode_FromString(tmp_lemma));
     }
-    PyList_Append(ret, option);
+    list_append(ret, option);
   }
   delete [] results;
   return ret;
