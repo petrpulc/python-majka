@@ -473,7 +473,7 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
   char* entry, * colon, * negative;
   char tmp_lemma[300];
   PyObject* ret = PyList_New(0);
-  PyObject* option;
+  PyObject* lemma, * tags, * option;
   int rc, i;
 
   static char* kwlist[] = {const_cast<char*>("word"), NULL};
@@ -498,9 +498,13 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
     tmp_lemma[colon-entry] = '\0';
 
     if (self->tags) {
+      lemma = PyUnicode_FromString(tmp_lemma);
+      tags = Majka_tags(colon+1);
       option = Py_BuildValue("{s:O,s:O}",
-                             "lemma", PyUnicode_FromString(tmp_lemma),
-                             "tags", Majka_tags(colon+1));
+                             "lemma", lemma,
+                             "tags", tags);
+      Py_DECREF(lemma);
+      Py_DECREF(tags);
     } else {
       if (is_negation(colon+1)){
 #ifdef PY3K
@@ -511,8 +515,10 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
         memmove(tmp_lemma+strlen(negative), tmp_lemma, strlen(tmp_lemma)+1);
         memcpy(tmp_lemma, negative, strlen(negative));
       }
+      lemma = PyUnicode_FromString(tmp_lemma);
       option = Py_BuildValue("{s:O}",
-                             "lemma", PyUnicode_FromString(tmp_lemma));
+                             "lemma", lemma);
+      Py_DECREF(lemma);
     }
     list_append(ret, option);
   }
