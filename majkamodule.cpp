@@ -86,7 +86,7 @@ static int dict_set_string(PyObject* dict, const char* key, const char* val){
   return dict_set(dict, key, obj);
 }
 
-static int dict_set_numeric(PyObject* dict, const char* key, const char* val){
+static int dict_set_numeric(PyObject* dict, const char* key, char* val){
   PyObject* obj = PyLong_FromString(val, NULL, 10);
   return dict_set(dict, key, obj);
 }
