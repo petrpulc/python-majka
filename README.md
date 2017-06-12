@@ -73,3 +73,6 @@ Original `majka` binary is in `majka/majka_bin.cc`, see `majka/Makefile` for bui
 ## Additional required downloads
 Morphological automatons are distributed separately under different licenses.
 See http://nlp.fi.muni.cz/ma/
+
+## Thanks
+ - Tomáš Karabela (@tkarabela) for discovering the memory leaks
