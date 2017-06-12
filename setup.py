@@ -6,7 +6,7 @@ Setup script for distutils, module majka.
 from distutils.core import setup, Extension
 
 setup(name='majka',
-      version='0.5',
+      version='0.6',
       description='Wrapper for Majka morphological analyser',
       long_description='''
 Native cPython binding to a C++ implementation of morphological analyser named Majka.
