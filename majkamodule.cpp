@@ -153,10 +153,10 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'A':
-        dict_set(tags, "negation", Py_False);
+        PyDict_SetItemString(tags, "negation", Py_False);
         break;
       case 'N':
-        dict_set(tags, "negation", Py_True);
+        PyDict_SetItemString(tags, "negation", Py_True);
         break;
     }
     ++tag_string;
@@ -218,11 +218,11 @@ static PyObject* Majka_tags(char * tag_string) {
     switch (*tag_string) {
       case 'M':
         dict_set_string(tags, "gender", "masculine");
-        dict_set(tags, "animate", Py_True);
+        PyDict_SetItemString(tags, "animate", Py_True);
         break;
       case 'I':
         dict_set_string(tags, "gender", "masculine");
-        dict_set(tags, "animate", Py_False);
+        PyDict_SetItemString(tags, "animate", Py_False);
         break;
       case 'F':
         dict_set_string(tags, "gender", "feminine");
@@ -238,10 +238,10 @@ static PyObject* Majka_tags(char * tag_string) {
     ++tag_string;
     switch (*tag_string) {
       case 'S':
-        dict_set(tags, "singular", Py_True);
+        PyDict_SetItemString(tags, "singular", Py_True);
         break;
       case 'P':
-        dict_set(tags, "plural", Py_True);
+        PyDict_SetItemString(tags, "plural", Py_True);
         break;
     }
     ++tag_string;
