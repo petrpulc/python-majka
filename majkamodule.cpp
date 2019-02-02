@@ -492,6 +492,12 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
 
   if (self->first_only) rc = 1;
 
+#ifdef PY3K
+  negative = PyUnicode_AsUTF8(self->negative);
+#else
+  negative = PyString_AsString(self->negative);
+#endif
+
   for (entry = results, i=0; i < rc; i++, entry += strlen(entry) + 1) {
     colon = strchr(entry, ':');
     memcpy(tmp_lemma, entry, colon-entry);
@@ -507,11 +513,6 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
       Py_DECREF(tags);
     } else {
       if (is_negation(colon+1)){
-#ifdef PY3K
-        negative = PyUnicode_AsUTF8(self->negative);
-#else
-        negative = PyString_AsString(self->negative);
-#endif
         memmove(tmp_lemma+strlen(negative), tmp_lemma, strlen(tmp_lemma)+1);
         memcpy(tmp_lemma, negative, strlen(negative));
       }
