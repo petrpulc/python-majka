@@ -470,7 +470,8 @@ static PyObject* Majka_tags(char * tag_string) {
 static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
   const char* word = NULL;
   char* results = new char[self->majka->max_results_size];
-  char* entry, * colon, * negative;
+  char* entry, * colon; 
+  const char* negative;
   char tmp_lemma[300];
   PyObject* ret = PyList_New(0);
   PyObject* lemma, * tags, * option;
