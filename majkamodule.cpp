@@ -62,7 +62,7 @@ static int Majka_init(Majka* self, PyObject* args, PyObject* kwds) {
   return 0;
 }
 
-int is_negation(char* tag_string){
+int is_negation(const char* tag_string){
   if (*tag_string == 'k'){
     tag_string += 2;
   }
@@ -102,7 +102,7 @@ static int list_append_string(PyObject* list, const char* val){
   return list_append(list, obj);
 }
 
-static PyObject* Majka_tags(char * tag_string) {
+static PyObject* Majka_tags(const char * tag_string) {
   PyObject* tags = PyDict_New();
   char category = ' ';
   char tmp[] = {'\0', '\0'};
@@ -470,8 +470,7 @@ static PyObject* Majka_tags(char * tag_string) {
 static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
   const char* word = NULL;
   char* results = new char[self->majka->max_results_size];
-  char* entry, * colon; 
-  const char* negative;
+  const char* entry, * colon, * negative;
   char tmp_lemma[300];
   PyObject* ret = PyList_New(0);
   PyObject* lemma, * tags, * option;
