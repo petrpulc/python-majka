@@ -511,7 +511,6 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
       option = Py_BuildValue("{s:O,s:O}",
                              "lemma", lemma,
                              "tags", tags);
-      Py_DECREF(lemma);
       Py_DECREF(tags);
     } else {
       if (is_negation(colon+1)){
@@ -521,8 +520,8 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
       lemma = PyUnicode_FromString(tmp_lemma);
       option = Py_BuildValue("{s:O}",
                              "lemma", lemma);
-      Py_DECREF(lemma);
     }
+    Py_DECREF(lemma);
 
     if (self->compact_tag) {
       dict_set_string(option, "compact_tag", colon+1);
