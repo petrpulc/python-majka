@@ -15,6 +15,7 @@ typedef struct {
   fsa* majka;
   int flags;
   bool tags;
+  bool compact_tag;
   bool first_only;
   PyObject* negative;
 } Majka;
@@ -32,6 +33,7 @@ static PyObject* Majka_new(PyTypeObject* type,
   self = reinterpret_cast<Majka*>(type->tp_alloc(type, 0));
   self->flags = 0;
   self->tags = true;
+  self->compact_tag = false;
   self->first_only = false;
   self->negative = PyUnicode_FromString("-");
   return reinterpret_cast<PyObject*>(self);
@@ -521,6 +523,11 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
                              "lemma", lemma);
       Py_DECREF(lemma);
     }
+
+    if (self->compact_tag) {
+      dict_set_string(option, "compact_tag", colon+1);
+    }
+
     list_append(ret, option);
   }
   delete [] results;
@@ -539,6 +546,8 @@ static PyMemberDef Majka_members[] = {
    const_cast<char*>("Flags to run Majka with.")},
   {const_cast<char*>("tags"), T_BOOL, offsetof(Majka, tags), 0,
    const_cast<char*>("If tags should be extracted and converted.")},
+  {const_cast<char*>("compact_tag"), T_BOOL, offsetof(Majka, compact_tag), 0,
+   const_cast<char*>("If original compact tag string should be extracted and returned.")},
   {const_cast<char*>("first_only"), T_BOOL, offsetof(Majka, first_only), 0,
    const_cast<char*>("If only first match should be returned.")},
   {const_cast<char*>("negative"), T_OBJECT, offsetof(Majka, negative), 0,

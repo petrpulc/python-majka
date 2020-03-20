@@ -34,6 +34,9 @@ No dependencies outside standard Python and C++ build environment should be need
     morph.tags = False  # return just the lemma, do not process the tags
     morph.tags = True  # turn tag processing back on (default)
 
+    morph.compact_tag = True  # return tag in compact form (as returned by Majka)
+    morph.compact_tag = False  # do not return compact tag (default)
+
     morph.first_only = True  # return only the first entry
     morph.first_only = False  # return all entries (default)
 
