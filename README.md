@@ -23,8 +23,10 @@ For local build / install use:
 No dependencies outside standard Python and C++ build environment should be needed. (gcc, python-dev, etc.)
 
 ## Usage
+Majka requires a morphological database (automaton) to work. See https://nlp.fi.muni.cz/ma/ for a list of available databases.
+
     import majka
-    morph = majka.Majka('path/to/dict')
+    morph = majka.Majka('path/to/database')
 
     morph.flags |= majka.ADD_DIACRITICS  # find word forms with diacritics
     morph.flags |= majka.DISALLOW_LOWERCASE  # do not enable to find lowercase variants
@@ -53,7 +55,9 @@ No dependencies outside standard Python and C++ build environment should be need
      },
     ...
     ]
-
+    
+### Note on tag translation
+Currently, the tag translation to a Python dictionary works only for databases following the Czech and Slovak tag reference. Other languages may return untranslated tags in field `other`.
 
 ## Usage with negations
 `.tags = False` causes a transformation of the negation into the lemma itself. By default, "-" sign is prepended, but value can be changed by setting the `.negative` value.
@@ -65,17 +69,12 @@ No dependencies outside standard Python and C++ build environment should be need
     morph.find('nejnevhodnější')
 
 ### Returns
-
     [{'lemma': 'nevhodný'}]
 
 ## Attributions
 The module is based on code of Pavel Smerk and Pavel Rychly, NLP group at MUNI, Czech Republic.
 
 Original `majka` binary is in `majka/majka_bin.cc`, see `majka/Makefile` for build.
-
-## Additional required downloads
-Morphological automatons are distributed separately under different licenses.
-See http://nlp.fi.muni.cz/ma/
 
 ## Thanks
  - Tomáš Karabela (@tkarabela) for discovering the memory leaks
