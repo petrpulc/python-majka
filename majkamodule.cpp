@@ -383,30 +383,30 @@ static PyObject* Majka_tags(const char * tag_string) {
   if (*tag_string == 't') {
     ++tag_string;
     switch (*tag_string) {
-        case 'S':
-            list_append_string(type, "status");
-            break;
-        case 'D':
-            list_append_string(type, "modal");
-            break;
-        case 'T':
-            list_append_string(type, "time");
-            break;
-        case 'A':
-            list_append_string(type, "respect");
-            break;
-        case 'C':
-            list_append_string(type, "reason");
-            break;
-        case 'L':
-            list_append_string(type, "place");
-            break;
-        case 'M':
-            list_append_string(type, "manner");
-            break;
-        case 'Q':
-            list_append_string(type, "extent");
-            break;
+      case 'S':
+        list_append_string(type, "status");
+        break;
+      case 'D':
+        list_append_string(type, "modal");
+        break;
+      case 'T':
+        list_append_string(type, "time");
+        break;
+      case 'A':
+        list_append_string(type, "respect");
+        break;
+      case 'C':
+        list_append_string(type, "reason");
+        break;
+      case 'L':
+        list_append_string(type, "place");
+        break;
+      case 'M':
+        list_append_string(type, "manner");
+        break;
+      case 'Q':
+        list_append_string(type, "extent");
+        break;
     }
     ++tag_string;
   }
@@ -502,34 +502,40 @@ static PyObject* Majka_find(Majka* self, PyObject* args, PyObject* kwds) {
 
   for (entry = results, i=0; i < rc; i++, entry += strlen(entry) + 1) {
     colon = strchr(entry, ':');
-    memcpy(tmp_lemma, entry, colon-entry);
-    tmp_lemma[colon-entry] = '\0';
-
-    if (self->tags) {
-      lemma = PyUnicode_FromString(tmp_lemma);
-      tags = Majka_tags(colon+1);
-      option = Py_BuildValue("{s:O,s:O}",
-                             "lemma", lemma,
-                             "tags", tags);
-      Py_DECREF(tags);
-    } else {
-      if (is_negation(colon+1)){
-        memmove(tmp_lemma+strlen(negative), tmp_lemma, strlen(tmp_lemma)+1);
-        memcpy(tmp_lemma, negative, strlen(negative));
-      }
-      lemma = PyUnicode_FromString(tmp_lemma);
+    if (colon == NULL) {
       option = Py_BuildValue("{s:O}",
-                             "lemma", lemma);
-    }
-    Py_DECREF(lemma);
+                             "word", PyUnicode_FromString(entry));
+      list_append(ret, option);
+    } else {
+      memcpy(tmp_lemma, entry, colon-entry);
+      tmp_lemma[colon-entry] = '\0';
 
-    if (self->compact_tag) {
-      dict_set_string(option, "compact_tag", colon+1);
-    }
+      if (self->tags) {
+        lemma = PyUnicode_FromString(tmp_lemma);
+        tags = Majka_tags(colon+1);
+        option = Py_BuildValue("{s:O,s:O}",
+                               "lemma", lemma,
+                               "tags", tags);
+        Py_DECREF(tags);
+      } else {
+        if (is_negation(colon+1)){
+          memmove(tmp_lemma+strlen(negative), tmp_lemma, strlen(tmp_lemma)+1);
+          memcpy(tmp_lemma, negative, strlen(negative));
+        }
+        lemma = PyUnicode_FromString(tmp_lemma);
+        option = Py_BuildValue("{s:O}",
+                               "lemma", lemma);
+      }
+      Py_DECREF(lemma);
 
-    list_append(ret, option);
+      if (self->compact_tag) {
+        dict_set_string(option, "compact_tag", colon + 1);
+      }
+
+      list_append(ret, option);
+    }
   }
-  delete [] results;
+  delete[] results;
   return ret;
 }
 
