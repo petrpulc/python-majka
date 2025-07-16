@@ -3,6 +3,7 @@
 Setup script for distutils, module majka.
 """
 
+import setuptools
 from distutils.core import setup, Extension
 
 setup(name='majka',
